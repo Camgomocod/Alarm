@@ -8,6 +8,9 @@ import datetime
 import requests
 import json
 import logging
+from playsound import playsound
+import threading
+import os
 
 class MainWindow(QMainWindow):
     # Configuraciones del clima
@@ -22,6 +25,8 @@ class MainWindow(QMainWindow):
         # Remover inicialización de pygame de aquí
         self.alarm_sound = None
         self.alarm_sound_file = "/mnt/c/Users/Usuario/Projects/Alarm/sounds/alarm.wav"
+        self.is_alarm_playing = False
+        self.alarm_thread = None
         
         # Intentar cargar el sonido al inicio
         self.initialize_sound()
@@ -152,30 +157,34 @@ class MainWindow(QMainWindow):
                 logging.error(f"Error inicializando simpleaudio: {e}")
                 self.sound_system = None
 
+    def play_sound_loop(self):
+        """Función que reproduce el sonido en bucle"""
+        while self.is_alarm_playing:
+            try:
+                playsound(self.alarm_sound_file)
+            except Exception as e:
+                print(f"Error reproduciendo sonido: {e}")
+                break
+
     def play_alarm_sound(self):
-        """Reproduce el sonido de la alarma"""
+        """Inicia la reproducción del sonido en un thread separado"""
         try:
-            if self.sound_system == 'pygame':
-                pygame.mixer.music.play(-1)  # -1 para reproducir en loop
-            elif self.sound_system == 'simpleaudio':
-                self.play_obj = self.wave_obj.play()
-            logging.info(f"Reproduciendo alarma usando {self.sound_system}")
+            if not self.is_alarm_playing:
+                self.is_alarm_playing = True
+                self.alarm_thread = threading.Thread(target=self.play_sound_loop)
+                self.alarm_thread.daemon = True  # El thread se cerrará cuando el programa principal termine
+                self.alarm_thread.start()
+                print("Reproduciendo alarma...")
         except Exception as e:
-            logging.error(f"Error reproduciendo sonido: {e}")
-            print(f"Error reproduciendo sonido: {e}")
+            print(f"Error iniciando reproducción: {e}")
 
     def stop_alarm_sound(self):
-        """Detiene el sonido de la alarma"""
-        try:
-            if self.sound_system == 'pygame':
-                pygame.mixer.music.stop()
-            elif self.sound_system == 'simpleaudio':
-                if hasattr(self, 'play_obj'):
-                    self.play_obj.stop()
-            logging.info("Sonido de alarma detenido")
-        except Exception as e:
-            logging.error(f"Error deteniendo sonido: {e}")
-            print(f"Error deteniendo sonido: {e}")
+        """Detiene la reproducción del sonido"""
+        self.is_alarm_playing = False
+        if self.alarm_thread:
+            self.alarm_thread.join(timeout=1)
+            self.alarm_thread = None
+        print("Alarma detenida")
 
     def show_alarm_settings(self):
         try:
@@ -261,13 +270,12 @@ class MainWindow(QMainWindow):
         # Conectar el botón para detener la alarma
         stop_button.clicked.connect(lambda: self.stop_alarm_and_close(dialog))
         
-        if self.sound_system:
-            self.play_alarm_sound()
+        self.play_alarm_sound()  # Reproducir sonido cuando se muestra el diálogo
         
         dialog.show()
 
     def stop_alarm_and_close(self, dialog):
-        self.stop_alarm_sound()
+        self.stop_alarm_sound()  # Detener sonido cuando se cierra el diálogo
         dialog.close()
         
         # Mantener la alarma configurada para el día siguiente
