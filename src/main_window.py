@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QSpacerIt
 from PyQt5.QtCore import QTimer, Qt, QTime
 from PyQt5.QtGui import QFont, QFontDatabase
 import pygame
+import simpleaudio as sa  # Añadir como respaldo
 from settings_window import AlarmSettingsWindow
 import datetime
 import requests
@@ -18,9 +19,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # Inicializar pygame antes de cualquier otra cosa
-        pygame.init()
-        pygame.mixer.init(44100, -16, 2, 2048)
+        # Remover inicialización de pygame de aquí
+        self.alarm_sound = None
+        self.alarm_sound_file = "/mnt/c/Users/Usuario/Projects/Alarm/sounds/alarm.wav"
+        
+        # Intentar cargar el sonido al inicio
+        self.initialize_sound()
         
         # Configuración de la ventana
         self.setWindowTitle("Raspberry Pi Alarm")
@@ -110,16 +114,6 @@ class MainWindow(QMainWindow):
         # Configuración de la alarma y sonido
         self.alarm_time = None
         
-        # Configuración del sonido
-        try:
-            pygame.mixer.init()
-            self.alarm_sound = pygame.mixer.Sound("/mnt/c/Users/Usuario/Projects/Alarm/sounds/alarm.wav")
-            self.alarm_sound.set_volume(1.0)  # Volumen al máximo
-        except Exception as e:
-            print(f"Error inicializando sonido: {e}")
-            logging.error(f"Error inicializando sonido: {e}")
-            self.alarm_sound = None
-        
         # Temporizadores
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_time)
@@ -138,6 +132,50 @@ class MainWindow(QMainWindow):
         
         self.update_time()
         self.update_weather()
+
+    def initialize_sound(self):
+        """Intenta inicializar el sistema de sonido"""
+        try:
+            # Primero intenta con pygame
+            pygame.mixer.init(44100, -16, 2, 2048)
+            pygame.mixer.music.load(self.alarm_sound_file)
+            self.sound_system = 'pygame'
+            logging.info("Sistema de sonido inicializado con pygame")
+        except Exception as e:
+            logging.error(f"Error inicializando pygame: {e}")
+            try:
+                # Si pygame falla, intenta con simpleaudio
+                self.wave_obj = sa.WaveObject.from_wave_file(self.alarm_sound_file)
+                self.sound_system = 'simpleaudio'
+                logging.info("Sistema de sonido inicializado con simpleaudio")
+            except Exception as e:
+                logging.error(f"Error inicializando simpleaudio: {e}")
+                self.sound_system = None
+
+    def play_alarm_sound(self):
+        """Reproduce el sonido de la alarma"""
+        try:
+            if self.sound_system == 'pygame':
+                pygame.mixer.music.play(-1)  # -1 para reproducir en loop
+            elif self.sound_system == 'simpleaudio':
+                self.play_obj = self.wave_obj.play()
+            logging.info(f"Reproduciendo alarma usando {self.sound_system}")
+        except Exception as e:
+            logging.error(f"Error reproduciendo sonido: {e}")
+            print(f"Error reproduciendo sonido: {e}")
+
+    def stop_alarm_sound(self):
+        """Detiene el sonido de la alarma"""
+        try:
+            if self.sound_system == 'pygame':
+                pygame.mixer.music.stop()
+            elif self.sound_system == 'simpleaudio':
+                if hasattr(self, 'play_obj'):
+                    self.play_obj.stop()
+            logging.info("Sonido de alarma detenido")
+        except Exception as e:
+            logging.error(f"Error deteniendo sonido: {e}")
+            print(f"Error deteniendo sonido: {e}")
 
     def show_alarm_settings(self):
         try:
@@ -166,7 +204,7 @@ class MainWindow(QMainWindow):
                current_qtime.minute() == self.alarm_time.minute() and \
                current_qtime.second() == 0:
                 try:
-                    self.alarm_sound.play()
+                    self.play_alarm_sound()
                 except:
                     print("Error reproduciendo sonido de alarma")
                 self.show_alarm_dialog()
@@ -223,22 +261,13 @@ class MainWindow(QMainWindow):
         # Conectar el botón para detener la alarma
         stop_button.clicked.connect(lambda: self.stop_alarm_and_close(dialog))
         
-        if self.alarm_sound:
-            try:
-                pygame.mixer.stop()  # Detener cualquier sonido previo
-                self.alarm_sound.play(loops=-1)  # Reproducir en loop
-            except Exception as e:
-                print(f"Error reproduciendo sonido: {e}")
-                logging.error(f"Error reproduciendo sonido: {e}")
+        if self.sound_system:
+            self.play_alarm_sound()
         
         dialog.show()
 
     def stop_alarm_and_close(self, dialog):
-        if self.alarm_sound:
-            try:
-                pygame.mixer.stop()
-            except Exception as e:
-                print(f"Error deteniendo sonido: {e}")
+        self.stop_alarm_sound()
         dialog.close()
         
         # Mantener la alarma configurada para el día siguiente
