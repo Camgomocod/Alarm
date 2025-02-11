@@ -10,6 +10,7 @@ import datetime
 import requests
 import json
 from playsound import playsound
+from paths_config import FONT_PATH, ALARM_SOUND_PATH, LOG_FILE_PATH
 
 class MainWindow(QMainWindow):
     # Configuraciones del clima
@@ -23,7 +24,7 @@ class MainWindow(QMainWindow):
         
         # Inicializar pygame para audio
         pygame.mixer.init()
-        self.alarm_sound_file = "/mnt/c/Users/Usuario/Projects/Alarm/sounds/alarm.wav"
+        self.alarm_sound_file = ALARM_SOUND_PATH
         self.is_alarm_playing = False
         
         try:
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # Asegurar pantalla completa
         
         # Cargar fuente retro
-        QFontDatabase.addApplicationFont("/mnt/c/Users/Usuario/Projects/Alarm/fonts/digital-7.ttf")
+        QFontDatabase.addApplicationFont(FONT_PATH)
         
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -132,7 +133,7 @@ class MainWindow(QMainWindow):
         
         # Configurar logging
         logging.basicConfig(
-            filename='weather_debug.log',
+            filename=LOG_FILE_PATH,
             level=logging.DEBUG,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
