@@ -37,16 +37,16 @@ class MainWindow(QMainWindow):
         # Agregar espacio superior
         layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         
-        # Reloj digital con nueva fuente y color (más grande)
+        # Reloj digital con nueva fuente y color (ajustado para 11")
         self.time_label = QLabel()
         self.time_label.setAlignment(Qt.AlignCenter)
-        self.time_label.setFont(QFont('Digital-7', 180))  # Aumentado a 180
+        self.time_label.setFont(QFont('Digital-7', 140))  # Reducido a 140
         self.time_label.setStyleSheet("color: #00ff00;")
         
-        # Fecha con estilo retro
+        # Fecha con estilo retro (ligeramente más pequeña)
         self.date_label = QLabel()
         self.date_label.setAlignment(Qt.AlignCenter)
-        self.date_label.setFont(QFont('Digital-7', 36))
+        self.date_label.setFont(QFont('Digital-7', 30))  # Reducido a 30
         self.date_label.setStyleSheet("color: #00ff00;")
         
         # Widget del clima con estilo retro

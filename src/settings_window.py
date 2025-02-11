@@ -12,22 +12,22 @@ class AlarmSettingsWindow(QDialog):
         self.setStyleSheet("""
             QDialog { 
                 background-color: #000000;
-                min-width: 400px;
-                min-height: 300px;
+                min-width: 300px;  # Reducido de 400px
+                min-height: 250px; # Reducido de 300px
             }
             QLabel { 
                 color: #00ff00; 
-                font-size: 32px; 
+                font-size: 24px;  # Reducido de 32px
                 font-family: 'Digital-7';
             }
             QPushButton { 
                 background-color: #003300; 
                 color: #00ff00; 
                 border: 2px solid #00ff00;
-                border-radius: 15px;
-                min-height: 60px;
-                min-width: 150px;
-                font-size: 24px;
+                border-radius: 10px;
+                min-height: 40px;  # Reducido de 60px
+                min-width: 120px;  # Reducido de 150px
+                font-size: 20px;   # Reducido de 24px
                 font-family: 'Digital-7';
             }
             QPushButton:hover {
@@ -50,7 +50,7 @@ class AlarmSettingsWindow(QDialog):
         # Agregar título visible
         title_label = QLabel("Configurar Hora de Alarma")
         title_label.setAlignment(Qt.AlignCenter)
-        title_label.setFont(QFont('Digital-7', 36))
+        title_label.setFont(QFont('Digital-7', 28))  # Reducido de 36
         title_label.setStyleSheet("color: #00ff00; margin: 20px;")
         layout.addWidget(title_label)
         
@@ -66,15 +66,15 @@ class AlarmSettingsWindow(QDialog):
         hour_down = QPushButton("▼")
         
         for widget in [hour_up, self.hour_display, hour_down]:
-            widget.setFont(QFont('Digital-7', 48))
+            widget.setFont(QFont('Digital-7', 36))  # Reducido de 48
             widget.setStyleSheet("""
                 QPushButton, QLabel { 
                     background-color: #003300; 
                     color: #00ff00; 
                     border: 2px solid #00ff00;
-                    border-radius: 15px;
-                    min-height: 80px;
-                    min-width: 120px;
+                    border-radius: 10px;
+                    min-height: 60px;  # Reducido de 80px
+                    min-width: 90px;   # Reducido de 120px
                 }
                 QPushButton:pressed {
                     background-color: #004400;
@@ -97,15 +97,15 @@ class AlarmSettingsWindow(QDialog):
         minute_down = QPushButton("▼")
         
         for widget in [minute_up, self.minute_display, minute_down]:
-            widget.setFont(QFont('Digital-7', 48))
+            widget.setFont(QFont('Digital-7', 36))  # Reducido de 48
             widget.setStyleSheet("""
                 QPushButton, QLabel { 
                     background-color: #003300; 
                     color: #00ff00; 
                     border: 2px solid #00ff00;
-                    border-radius: 15px;
-                    min-height: 80px;
-                    min-width: 120px;
+                    border-radius: 10px;
+                    min-height: 60px;  # Reducido de 80px
+                    min-width: 90px;   # Reducido de 120px
                 }
                 QPushButton:pressed {
                     background-color: #004400;
@@ -134,15 +134,15 @@ class AlarmSettingsWindow(QDialog):
         cancel_button = QPushButton("CANCELAR")
         
         for button in [save_button, cancel_button]:
-            button.setFont(QFont('Digital-7', 24))
+            button.setFont(QFont('Digital-7', 20))  # Reducido de 24
             button.setStyleSheet("""
                 QPushButton { 
                     background-color: #003300; 
                     color: #00ff00; 
                     border: 2px solid #00ff00;
-                    border-radius: 15px;
-                    min-height: 80px;
-                    min-width: 200px;
+                    border-radius: 10px;
+                    min-height: 50px;   # Reducido de 80px
+                    min-width: 140px;   # Reducido de 200px
                 }
                 QPushButton:pressed {
                     background-color: #004400;
