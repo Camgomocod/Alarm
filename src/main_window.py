@@ -49,11 +49,43 @@ class MainWindow(QMainWindow):
         # Agregar espacio superior
         layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         
-        # Reloj digital con nueva fuente y color (ajustado para 11")
-        self.time_label = QLabel()
-        self.time_label.setAlignment(Qt.AlignCenter)
-        self.time_label.setFont(QFont('Digital-7', 140))  # Reducido a 140
-        self.time_label.setStyleSheet("color: #00ff00;")
+        # Crear un contenedor para el reloj
+        clock_container = QWidget()
+        clock_container.setStyleSheet("background-color: transparent;")
+        clock_layout = QHBoxLayout(clock_container)
+        clock_layout.setSpacing(20)  # Espacio entre los recuadros
+        
+        # Crear los tres displays del reloj (horas, minutos, segundos)
+        self.hours_label = QLabel()
+        self.minutes_label = QLabel()
+        self.seconds_label = QLabel()
+        
+        # Estilo común para todos los displays del reloj
+        clock_style = """
+            QLabel {
+                color: #00ff00;
+                background-color: #001100;
+                border: 4px solid #003300;
+                border-radius: 20px;
+                padding: 20px;
+                margin: 5px;
+                min-width: 220px;
+            }
+        """
+        
+        # Aplicar estilo y configuración a cada display
+        for label in [self.hours_label, self.minutes_label, self.seconds_label]:
+            label.setAlignment(Qt.AlignCenter)
+            label.setFont(QFont('Digital-7', 180))
+            label.setStyleSheet(clock_style)
+        
+        # Agregar los displays al layout
+        clock_layout.addWidget(self.hours_label)
+        clock_layout.addWidget(self.minutes_label)
+        clock_layout.addWidget(self.seconds_label)
+        
+        # Agregar el contenedor del reloj al layout principal
+        layout.addWidget(clock_container)
         
         # Fecha con estilo retro (ligeramente más pequeña)
         self.date_label = QLabel()
@@ -67,7 +99,6 @@ class MainWindow(QMainWindow):
         self.weather_label.setFont(QFont('Digital-7', 24))
         self.weather_label.setStyleSheet("color: #00ff00;")
         
-        layout.addWidget(self.time_label)
         layout.addWidget(self.date_label)
         
         # Agregar espacio entre fecha y clima
@@ -179,8 +210,10 @@ class MainWindow(QMainWindow):
     
     def update_time(self):
         current_time = datetime.datetime.now()
-        self.time_label.setText(current_time.strftime("%H:%M:%S"))
-        self.date_label.setText(current_time.strftime("%A, %d %B %Y"))
+        self.hours_label.setText(current_time.strftime("%H"))
+        self.minutes_label.setText(current_time.strftime("%M"))
+        self.seconds_label.setText(current_time.strftime("%S"))
+        self.date_label.setText(current_time.strftime("%A, %d %B %Y").upper())  # Mayúsculas para estilo retro
         
         # Verificar alarma
         if self.alarm_time:
