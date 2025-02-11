@@ -106,15 +106,22 @@ class MainWindow(QMainWindow):
         
         layout.addWidget(self.weather_label)
         
-        # Contenedor para botón y etiqueta de alarma (sin borde)
+        # Contenedor para botón y etiqueta de alarma
         alarm_container = QWidget()
-        alarm_container.setStyleSheet("background-color: transparent;")
+        alarm_container.setStyleSheet("""
+            QWidget {
+                background-color: #001100;
+                border: 2px solid #003300;
+                border-radius: 15px;
+                padding: 10px;
+            }
+        """)
         alarm_layout = QHBoxLayout(alarm_container)
-        alarm_layout.setContentsMargins(10, 10, 10, 10)  # Reducir márgenes
+        alarm_layout.setContentsMargins(20, 15, 20, 15)
         
-        # Botón de alarma con estilo retro (reducido)
+        # Botón de alarma con estilo retro actualizado
         self.alarm_button = QPushButton("|| ALARMA")
-        self.alarm_button.setFont(QFont('Digital-7', 20))  # Reducido a 20
+        self.alarm_button.setFont(QFont('Digital-7', 24))
         self.alarm_button.setStyleSheet("""
             QPushButton { 
                 background-color: #003300; 
@@ -122,7 +129,7 @@ class MainWindow(QMainWindow):
                 border: 2px solid #00ff00;
                 border-radius: 10px;
                 min-height: 50px;
-                min-width: 120px;
+                min-width: 130px;
                 padding: 5px;
             }
             QPushButton:pressed {
@@ -130,17 +137,27 @@ class MainWindow(QMainWindow):
             }
             QPushButton:hover {
                 border: 3px solid #00ff00;
+                background-color: #003300;
             }
         """)
         self.alarm_button.setCursor(Qt.PointingHandCursor)
         # Asegurar que la conexión sea correcta
         self.alarm_button.clicked.connect(lambda: self.show_alarm_settings())
         
-        # Etiqueta para mostrar la alarma configurada (reducida)
+        # Etiqueta para mostrar la alarma configurada
         self.alarm_label = QLabel("No hay alarma configurada")
         self.alarm_label.setAlignment(Qt.AlignCenter)
-        self.alarm_label.setFont(QFont('Digital-7', 20))  # Reducido a 20
-        self.alarm_label.setStyleSheet("color: #00ff00;")
+        self.alarm_label.setFont(QFont('Digital-7', 24))
+        self.alarm_label.setStyleSheet("""
+            QLabel {
+                color: #00ff00;
+                background-color: #001100;
+                border: 2px solid #003300;
+                border-radius: 10px;
+                padding: 10px 20px;
+                min-width: 300px;
+            }
+        """)
         
         # Organizar botón y etiqueta horizontalmente
         alarm_layout.addWidget(self.alarm_button)
@@ -201,7 +218,7 @@ class MainWindow(QMainWindow):
             
             if dialog.exec_() == QDialog.Accepted:
                 self.alarm_time = dialog.get_alarm_time()
-                self.alarm_label.setText(f"|| {self.alarm_time.toString('HH:mm')}")
+                self.alarm_label.setText(f"▶ {self.alarm_time.toString('HH:mm')} ◀")
                 # Agregar feedback visual
                 self.alarm_button.setStyleSheet(self.alarm_button.styleSheet() + "background-color: #004400;")
                 QTimer.singleShot(200, lambda: self.alarm_button.setStyleSheet(self.alarm_button.styleSheet()))
@@ -289,7 +306,7 @@ class MainWindow(QMainWindow):
         
         # Mantener la alarma configurada para el día siguiente
         if self.alarm_time:
-            self.alarm_label.setText(f"|| Próxima alarma: {self.alarm_time.toString('HH:mm')}")
+            self.alarm_label.setText(f"▶ Próxima alarma: {self.alarm_time.toString('HH:mm')} ◀")
 
     def update_weather(self):
         try:
