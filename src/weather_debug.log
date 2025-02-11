@@ -877,3 +877,11 @@
 2025-02-11 13:56:49,750 - DEBUG - Respuesta: {'lat': 3.55, 'lon': -76.38, 'alt_m': 961.0, 'alt_ft': 3152.89, 'wx_desc': 'Mostly cloudy', 'wx_code': 1, 'wx_icon': 'PartlyCloudyDay.gif', 'temp_c': 24.0, 'temp_f': 75.2, 'feelslike_c': 24.83, 'feelslike_f': 76.7, 'humid_pct': 74.0, 'windspd_mph': 0.0, 'windspd_kmh': 0.0, 'windspd_kts': 0.0, 'windspd_ms': 0.0, 'winddir_deg': 340.0, 'winddir_compass': 'NNW', 'cloudtotal_pct': 75.0, 'vis_km': 10.0, 'vis_mi': 6.21, 'vis_desc': None, 'slp_mb': 1014.9, 'slp_in': 30.05, 'dewpoint_c': 19.09, 'dewpoint_f': 66.35}
 2025-02-11 13:56:49,751 - INFO - Clima actualizado exitosamente: > 24.0°C | Mostly cloudy
 > Humedad: 74.0%
+2025-02-11 14:25:42,738 - DEBUG - Intentando conectar a WeatherUnlocked...
+2025-02-11 14:25:42,740 - DEBUG - Starting new HTTP connection (1): api.weatherunlocked.com:80
+2025-02-11 14:25:43,369 - DEBUG - http://api.weatherunlocked.com:80 "GET /api/current/2.4448,-76.6147?app_id=e2c5c5e4&app_key=519d24835c42f18e42f8bfc8f64c3e6a HTTP/1.1" 200 458
+2025-02-11 14:25:43,370 - DEBUG - Código de estado HTTP: 200
+2025-02-11 14:25:43,370 - DEBUG - URL completa: http://api.weatherunlocked.com/api/current/2.4448,-76.6147?app_id=e2c5c5e4&app_key=519d24835c42f18e42f8bfc8f64c3e6a
+2025-02-11 14:25:43,370 - DEBUG - Respuesta: {'lat': 3.55, 'lon': -76.38, 'alt_m': 961.0, 'alt_ft': 3152.89, 'wx_desc': 'Mostly cloudy', 'wx_code': 1, 'wx_icon': 'PartlyCloudyDay.gif', 'temp_c': 24.0, 'temp_f': 75.2, 'feelslike_c': 24.83, 'feelslike_f': 76.7, 'humid_pct': 74.0, 'windspd_mph': 0.0, 'windspd_kmh': 0.0, 'windspd_kts': 0.0, 'windspd_ms': 0.0, 'winddir_deg': 190.0, 'winddir_compass': 'S', 'cloudtotal_pct': 75.0, 'vis_km': 10.0, 'vis_mi': 6.21, 'vis_desc': None, 'slp_mb': 1014.9, 'slp_in': 30.05, 'dewpoint_c': 19.09, 'dewpoint_f': 66.35}
+2025-02-11 14:25:43,371 - INFO - Clima actualizado exitosamente: > 24.0°C | Mostly cloudy
+> Humedad: 74.0%

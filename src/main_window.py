@@ -2,15 +2,14 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QSpacerIt
 from PyQt5.QtCore import QTimer, Qt, QTime
 from PyQt5.QtGui import QFont, QFontDatabase
 import pygame
-import simpleaudio as sa  # Añadir como respaldo
+import threading
+import os
+import logging
 from settings_window import AlarmSettingsWindow
 import datetime
 import requests
 import json
-import logging
 from playsound import playsound
-import threading
-import os
 
 class MainWindow(QMainWindow):
     # Configuraciones del clima
@@ -22,14 +21,17 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # Remover inicialización de pygame de aquí
-        self.alarm_sound = None
+        # Inicializar pygame para audio
+        pygame.mixer.init()
         self.alarm_sound_file = "/mnt/c/Users/Usuario/Projects/Alarm/sounds/alarm.wav"
         self.is_alarm_playing = False
-        self.alarm_thread = None
         
-        # Intentar cargar el sonido al inicio
-        self.initialize_sound()
+        try:
+            pygame.mixer.music.load(self.alarm_sound_file)
+            print("Sonido cargado correctamente")
+        except Exception as e:
+            print(f"Error cargando sonido: {e}")
+            logging.error(f"Error cargando sonido: {e}")
         
         # Configuración de la ventana
         self.setWindowTitle("Raspberry Pi Alarm")
@@ -138,53 +140,26 @@ class MainWindow(QMainWindow):
         self.update_time()
         self.update_weather()
 
-    def initialize_sound(self):
-        """Intenta inicializar el sistema de sonido"""
-        try:
-            # Primero intenta con pygame
-            pygame.mixer.init(44100, -16, 2, 2048)
-            pygame.mixer.music.load(self.alarm_sound_file)
-            self.sound_system = 'pygame'
-            logging.info("Sistema de sonido inicializado con pygame")
-        except Exception as e:
-            logging.error(f"Error inicializando pygame: {e}")
-            try:
-                # Si pygame falla, intenta con simpleaudio
-                self.wave_obj = sa.WaveObject.from_wave_file(self.alarm_sound_file)
-                self.sound_system = 'simpleaudio'
-                logging.info("Sistema de sonido inicializado con simpleaudio")
-            except Exception as e:
-                logging.error(f"Error inicializando simpleaudio: {e}")
-                self.sound_system = None
-
-    def play_sound_loop(self):
-        """Función que reproduce el sonido en bucle"""
-        while self.is_alarm_playing:
-            try:
-                playsound(self.alarm_sound_file)
-            except Exception as e:
-                print(f"Error reproduciendo sonido: {e}")
-                break
-
     def play_alarm_sound(self):
-        """Inicia la reproducción del sonido en un thread separado"""
+        """Reproduce el sonido de la alarma en loop"""
         try:
             if not self.is_alarm_playing:
                 self.is_alarm_playing = True
-                self.alarm_thread = threading.Thread(target=self.play_sound_loop)
-                self.alarm_thread.daemon = True  # El thread se cerrará cuando el programa principal termine
-                self.alarm_thread.start()
+                pygame.mixer.music.play(-1)  # -1 significa loop infinito
                 print("Reproduciendo alarma...")
         except Exception as e:
-            print(f"Error iniciando reproducción: {e}")
+            print(f"Error reproduciendo sonido: {e}")
+            logging.error(f"Error reproduciendo sonido: {e}")
 
     def stop_alarm_sound(self):
-        """Detiene la reproducción del sonido"""
-        self.is_alarm_playing = False
-        if self.alarm_thread:
-            self.alarm_thread.join(timeout=1)
-            self.alarm_thread = None
-        print("Alarma detenida")
+        """Detiene el sonido de la alarma"""
+        try:
+            pygame.mixer.music.stop()
+            self.is_alarm_playing = False
+            print("Alarma detenida")
+        except Exception as e:
+            print(f"Error deteniendo sonido: {e}")
+            logging.error(f"Error deteniendo sonido: {e}")
 
     def show_alarm_settings(self):
         try:
