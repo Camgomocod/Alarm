@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy, QPushButton, QMessageBox, QHBoxLayout, QDialog
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy, QPushButton, QMessageBox, QHBoxLayout, QDialog, QScrollArea
 from PyQt5.QtCore import QTimer, Qt, QTime
 from PyQt5.QtGui import QFont, QFontDatabase
 import pygame
@@ -11,6 +11,8 @@ import requests
 import json
 from playsound import playsound
 from paths_config import FONT_PATH, ALARM_SOUND_PATH, LOG_FILE_PATH
+from calendar_handler import CalendarHandler
+from emoji_animation import EmojiWidget
 
 class MainWindow(QMainWindow):
     # Configuraciones del clima
@@ -44,10 +46,25 @@ class MainWindow(QMainWindow):
         
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
         
+        # Crear layout principal horizontal
+        main_layout = QHBoxLayout(central_widget)
+        
+        # Contenedor izquierdo (60%)
+        left_container = QWidget()
+        left_layout = QVBoxLayout(left_container)
+        
+        # Contenedor derecho (35%)
+        right_container = QWidget()
+        right_layout = QVBoxLayout(right_container)
+        
+        # Configurar proporciones
+        main_layout.addWidget(left_container, 60)
+        main_layout.addWidget(right_container, 35)
+        
+        # Mover el código existente del reloj, fecha y clima al contenedor izquierdo
         # Agregar espacio superior
-        layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        left_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         
         # Crear un contenedor para el reloj
         clock_container = QWidget()
@@ -85,7 +102,7 @@ class MainWindow(QMainWindow):
         clock_layout.addWidget(self.seconds_label)
         
         # Agregar el contenedor del reloj al layout principal
-        layout.addWidget(clock_container)
+        left_layout.addWidget(clock_container)
         
         # Fecha con estilo retro (ligeramente más pequeña)
         self.date_label = QLabel()
@@ -99,12 +116,23 @@ class MainWindow(QMainWindow):
         self.weather_label.setFont(QFont('Digital-7', 24))
         self.weather_label.setStyleSheet("color: #00ff00;")
         
-        layout.addWidget(self.date_label)
+        left_layout.addWidget(self.date_label)
         
         # Agregar espacio entre fecha y clima
-        layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        left_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
         
-        layout.addWidget(self.weather_label)
+        left_layout.addWidget(self.weather_label)
+        
+        # Añadir espacio antes del emoji (reducido)
+        left_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        
+        # Añadir emoji animation con tamaño fijo
+        self.emoji = EmojiWidget()
+        self.emoji.setFixedHeight(100)  # Asegurar altura fija
+        left_layout.addWidget(self.emoji, alignment=Qt.AlignCenter)
+        
+        # Reducir el espacio entre el emoji y el contenedor de alarma
+        left_layout.addItem(QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Fixed))
         
         # Contenedor para botón y etiqueta de alarma
         alarm_container = QWidget()
@@ -113,7 +141,7 @@ class MainWindow(QMainWindow):
                 background-color: #001100;
                 border: 2px solid #003300;
                 border-radius: 15px;
-                padding: 10px;
+                padding: 5px;
             }
         """)
         alarm_layout = QHBoxLayout(alarm_container)
@@ -164,8 +192,9 @@ class MainWindow(QMainWindow):
         alarm_layout.addWidget(self.alarm_label)
         
         # Agregar el contenedor de alarma al layout principal
-        layout.addItem(QSpacerItem(20, 20))
-        layout.addWidget(alarm_container)
+        left_layout.addItem(QSpacerItem(20, 20))
+        left_layout.addWidget(alarm_container)
+        left_layout.addStretch()
         
         # Configuración de la alarma y sonido
         self.alarm_time = None
@@ -177,7 +206,7 @@ class MainWindow(QMainWindow):
         
         self.weather_timer = QTimer()
         self.weather_timer.timeout.connect(self.update_weather)
-        self.weather_timer.start(10000)  # Primer update en 10 segundos
+        self.weather_timer.start(900000)  # 15 minutos = 900000 milisegundos
         
         # Configurar logging
         logging.basicConfig(
@@ -188,6 +217,81 @@ class MainWindow(QMainWindow):
         
         self.update_time()
         self.update_weather()
+
+        # Después del contenedor de alarma, agregar el widget de agenda
+        # Crear widget de agenda
+        agenda_container = QWidget()
+        agenda_container.setStyleSheet("""
+            QWidget {
+                background-color: #001100;
+                border: 2px solid #003300;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 5px;
+            }
+        """)
+        
+        # Título de la agenda
+        agenda_title = QLabel("AGENDA")
+        agenda_title.setFont(QFont('Digital-7', 24))
+        agenda_title.setStyleSheet("""
+            color: #00ff00;
+            padding: 5px;
+            margin-bottom: 5px;
+        """)
+        agenda_title.setAlignment(Qt.AlignCenter)
+        
+        # Lista de eventos
+        self.events_widget = QWidget()
+        self.events_layout = QVBoxLayout(self.events_widget)
+        self.events_layout.setSpacing(5)
+        
+        # Lista de eventos con scroll
+        events_scroll = QScrollArea()
+        events_scroll.setWidget(self.events_widget)
+        events_scroll.setWidgetResizable(True)
+        events_scroll.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background: transparent;
+                margin: 0px;
+                padding: 0px;
+            }
+            QScrollBar:vertical {
+                background: #001100;
+                width: 8px;
+                border-radius: 4px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background: #003300;
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
+        
+        agenda_layout = QVBoxLayout(agenda_container)
+        agenda_layout.setContentsMargins(5, 5, 5, 5)
+        agenda_layout.setSpacing(5)
+        agenda_layout.addWidget(agenda_title)
+        agenda_layout.addWidget(events_scroll)
+        
+        right_layout.addWidget(agenda_container)
+        
+        # Inicializar el manejador de calendario
+        try:
+            self.calendar_handler = CalendarHandler()
+            # Timer para actualizar eventos cada 5 minutos
+            self.calendar_timer = QTimer()
+            self.calendar_timer.timeout.connect(self.update_events)
+            self.calendar_timer.start(300000)  # 5 minutos = 300000 milisegundos
+            # Primera actualización inmediata
+            self.update_events()
+        except Exception as e:
+            logging.error(f"Error inicializando Calendar Handler: {e}")
 
     def play_alarm_sound(self):
         """Reproduce el sonido de la alarma en loop"""
@@ -330,19 +434,19 @@ class MainWindow(QMainWindow):
             logging.debug(f"Respuesta: {data}")
             
             if 'temp_c' in data and 'humid_pct' in data:
-                temp = data['temp_c']
+                temp = data['temp_c'] - 6  # Restar 6 grados a la temperatura
                 humidity = data['humid_pct']
                 description = data.get('wx_desc', '')
                 
-                # Mostrar información del clima
+                # Mostrar información del clima con la temperatura ajustada
                 weather_text = (f"> {temp:.1f}°C | {description}\n"
                               f"> Humedad: {humidity}%")
                 
                 self.weather_label.setText(weather_text)
                 logging.info(f"Clima actualizado exitosamente: {weather_text}")
                 
-                # Cambiar intervalo a 30 minutos si fue exitoso
-                self.weather_timer.setInterval(1800000)
+                # Cambiar intervalo a 15 minutos después de una actualización exitosa
+                self.weather_timer.setInterval(900000)
             else:
                 raise KeyError("Datos del clima incompletos")
                 
@@ -360,3 +464,69 @@ class MainWindow(QMainWindow):
             error_msg = f"Error inesperado: {str(e)}"
             self.weather_label.setText(error_msg)
             logging.error(error_msg)
+
+    def update_events(self):
+        try:
+            # Limpiar eventos anteriores
+            for i in reversed(range(self.events_layout.count())): 
+                self.events_layout.itemAt(i).widget().setParent(None)
+            
+            events = self.calendar_handler.get_todays_events()
+            
+            if not events:
+                no_events = QLabel("No hay eventos programados")
+                no_events.setFont(QFont('Digital-7', 20))
+                no_events.setStyleSheet("color: #00ff00;")
+                no_events.setAlignment(Qt.AlignCenter)
+                self.events_layout.addWidget(no_events)
+            else:
+                for event in events:
+                    # Crear contenedor para cada evento
+                    event_widget = QWidget()
+                    event_layout = QVBoxLayout(event_widget)
+                    event_layout.setContentsMargins(10, 12, 10, 12)  # Aumentar márgenes internos
+                    event_layout.setSpacing(4)  # Más espacio entre hora y título
+                    
+                    # Hora del evento
+                    time_label = QLabel(event['time'])
+                    time_label.setFont(QFont('Digital-7', 22))  # Aumentado de 16 a 22
+                    time_label.setStyleSheet("""
+                        color: #00ff00;
+                        padding: 2px;
+                    """)
+                    
+                    # Título del evento
+                    title_label = QLabel(event['summary'])
+                    title_label.setFont(QFont('Digital-7', 24))  # Aumentado de 18 a 24
+                    title_label.setStyleSheet("""
+                        color: #00ff00;
+                        padding: 2px;
+                    """)
+                    title_label.setWordWrap(True)
+                    
+                    event_layout.addWidget(time_label)
+                    event_layout.addWidget(title_label)
+                    
+                    event_widget.setStyleSheet("""
+                        QWidget {
+                            background-color: #002200;
+                            border-radius: 8px;
+                            padding: 8px;
+                            margin: 4px;
+                        }
+                    """)
+                    
+                    self.events_layout.addWidget(event_widget)
+                
+                # Ajustar el espaciado entre eventos
+                self.events_layout.setSpacing(8)  # Aumentado de 4 a 8
+            
+            # Ajustar el espaciado del layout de eventos
+            self.events_layout.setContentsMargins(4, 4, 4, 4)
+            
+        except Exception as e:
+            logging.error(f"Error actualizando eventos: {e}")
+            error_widget = QLabel("Error cargando eventos")
+            error_widget.setFont(QFont('Digital-7', 20))
+            error_widget.setStyleSheet("color: #ff0000;")
+            self.events_layout.addWidget(error_widget)
