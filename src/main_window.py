@@ -59,8 +59,9 @@ class MainWindow(QMainWindow):
         right_layout = QVBoxLayout(right_container)
         
         # Configurar proporciones
-        main_layout.addWidget(left_container, 60)
-        main_layout.addWidget(right_container, 35)
+        main_layout.addWidget(left_container, 65)  # Aumentar proporción izquierda
+        main_layout.addWidget(right_container, 32)  # Reducir proporción derecha
+        main_layout.setSpacing(5)  # Reducir espacio entre contenedores
         
         # Mover el código existente del reloj, fecha y clima al contenedor izquierdo
         # Agregar espacio superior
@@ -70,7 +71,7 @@ class MainWindow(QMainWindow):
         clock_container = QWidget()
         clock_container.setStyleSheet("background-color: transparent;")
         clock_layout = QHBoxLayout(clock_container)
-        clock_layout.setSpacing(20)  # Espacio entre los recuadros
+        clock_layout.setSpacing(10)  # Reducido de 20 a 10
         
         # Crear los tres displays del reloj (horas, minutos, segundos)
         self.hours_label = QLabel()
@@ -82,18 +83,18 @@ class MainWindow(QMainWindow):
             QLabel {
                 color: #00ff00;
                 background-color: #001100;
-                border: 4px solid #003300;
-                border-radius: 20px;
-                padding: 20px;
-                margin: 5px;
-                min-width: 220px;
+                border: 3px solid #003300;
+                border-radius: 15px;
+                padding: 10px;
+                margin: 3px;
+                min-width: 150px;
             }
         """
         
         # Aplicar estilo y configuración a cada display
         for label in [self.hours_label, self.minutes_label, self.seconds_label]:
             label.setAlignment(Qt.AlignCenter)
-            label.setFont(QFont('Digital-7', 180))
+            label.setFont(QFont('Digital-7', 120))  # Reducido de 180 a 120
             label.setStyleSheet(clock_style)
         
         # Agregar los displays al layout
@@ -107,13 +108,13 @@ class MainWindow(QMainWindow):
         # Fecha con estilo retro (ligeramente más pequeña)
         self.date_label = QLabel()
         self.date_label.setAlignment(Qt.AlignCenter)
-        self.date_label.setFont(QFont('Digital-7', 30))  # Reducido a 30
+        self.date_label.setFont(QFont('Digital-7', 24))  # Reducido de 30 a 24
         self.date_label.setStyleSheet("color: #00ff00;")
         
         # Widget del clima con estilo retro
         self.weather_label = QLabel()
         self.weather_label.setAlignment(Qt.AlignCenter)
-        self.weather_label.setFont(QFont('Digital-7', 24))
+        self.weather_label.setFont(QFont('Digital-7', 20))  # Reducido de 24 a 20
         self.weather_label.setStyleSheet("color: #00ff00;")
         
         left_layout.addWidget(self.date_label)
@@ -128,7 +129,7 @@ class MainWindow(QMainWindow):
         
         # Añadir emoji animation con tamaño fijo
         self.emoji = EmojiWidget()
-        self.emoji.setFixedHeight(100)  # Asegurar altura fija
+        self.emoji.setFixedHeight(80)  # Reducido de 100 a 80
         left_layout.addWidget(self.emoji, alignment=Qt.AlignCenter)
         
         # Reducir el espacio entre el emoji y el contenedor de alarma
@@ -233,7 +234,7 @@ class MainWindow(QMainWindow):
         
         # Título de la agenda
         agenda_title = QLabel("AGENDA")
-        agenda_title.setFont(QFont('Digital-7', 24))
+        agenda_title.setFont(QFont('Digital-7', 20))  # Reducido de 24 a 20
         agenda_title.setStyleSheet("""
             color: #00ff00;
             padding: 5px;
@@ -259,14 +260,14 @@ class MainWindow(QMainWindow):
             }
             QScrollBar:vertical {
                 background: #001100;
-                width: 8px;
-                border-radius: 4px;
+                width: 6px;
+                border-radius: 3px;
                 margin: 0px;
             }
             QScrollBar::handle:vertical {
                 background: #003300;
-                border-radius: 4px;
-                min-height: 30px;
+                border-radius: 3px;
+                min-height: 20px;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
@@ -475,7 +476,7 @@ class MainWindow(QMainWindow):
             
             if not events:
                 no_events = QLabel("No hay eventos programados")
-                no_events.setFont(QFont('Digital-7', 20))
+                no_events.setFont(QFont('Digital-7', 18))  # Reducido de 20 a 18
                 no_events.setStyleSheet("color: #00ff00;")
                 no_events.setAlignment(Qt.AlignCenter)
                 self.events_layout.addWidget(no_events)
@@ -489,7 +490,7 @@ class MainWindow(QMainWindow):
                     
                     # Hora del evento
                     time_label = QLabel(event['time'])
-                    time_label.setFont(QFont('Digital-7', 22))  # Aumentado de 16 a 22
+                    time_label.setFont(QFont('Digital-7', 18))  # Reducido de 22 a 18
                     time_label.setStyleSheet("""
                         color: #00ff00;
                         padding: 2px;
@@ -497,7 +498,7 @@ class MainWindow(QMainWindow):
                     
                     # Título del evento
                     title_label = QLabel(event['summary'])
-                    title_label.setFont(QFont('Digital-7', 24))  # Aumentado de 18 a 24
+                    title_label.setFont(QFont('Digital-7', 20))  # Reducido de 24 a 20
                     title_label.setStyleSheet("""
                         color: #00ff00;
                         padding: 2px;
@@ -510,9 +511,9 @@ class MainWindow(QMainWindow):
                     event_widget.setStyleSheet("""
                         QWidget {
                             background-color: #002200;
-                            border-radius: 8px;
-                            padding: 8px;
-                            margin: 4px;
+                            border-radius: 6px;
+                            padding: 5px;
+                            margin: 2px;
                         }
                     """)
                     
