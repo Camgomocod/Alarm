@@ -13,8 +13,7 @@ from playsound import playsound
 from paths_config import FONT_PATH, ALARM_SOUND_PATH, LOG_FILE_PATH
 from calendar_handler import CalendarHandler
 from emoji_animation import EmojiWidget
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl
+import vlc
 
 class MainWindow(QMainWindow):
     # Configuraciones del clima
@@ -296,29 +295,24 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.error(f"Error inicializando Calendar Handler: {e}")
 
-        # Inicializar QMediaPlayer para reproducir el sonido de alarma
-        self.alarmPlayer = QMediaPlayer()
+        # Inicializar python-vlc media player para reproducir el sonido de alarma
         self.alarm_sound_file = ALARM_SOUND_PATH
-        self.alarmPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.alarm_sound_file)))
+        self.alarmPlayer = vlc.MediaPlayer(self.alarm_sound_file)
         self.is_alarm_playing = False
 
     def play_alarm_sound(self):
-        """Reproduce el sonido de la alarma en loop (alternativo con QMediaPlayer)"""
+        """Reproduce el sonido de la alarma usando python-vlc"""
         try:
             if not self.is_alarm_playing:
                 self.is_alarm_playing = True
                 self.alarmPlayer.play()
-                # No existe loop nativo; se puede conectar a la señal mediaStatusChanged para reiniciar si es necesario
-                self.alarmPlayer.mediaStatusChanged.connect(
-                    lambda status: self.alarmPlayer.play() if status == QMediaPlayer.EndOfMedia and self.is_alarm_playing else None
-                )
-                print("Reproduciendo alarma con QMediaPlayer...")
+                print("Reproduciendo alarma con python-vlc...")
         except Exception as e:
             print(f"Error reproduciendo sonido: {e}")
             logging.error(f"Error reproduciendo sonido: {e}")
 
     def stop_alarm_sound(self):
-        """Detiene el sonido de la alarma usando QMediaPlayer"""
+        """Detiene el sonido de la alarma usando python-vlc"""
         try:
             self.alarmPlayer.stop()
             self.is_alarm_playing = False
