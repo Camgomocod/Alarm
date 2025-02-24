@@ -301,21 +301,28 @@ class MainWindow(QMainWindow):
         self.is_alarm_playing = False
 
     def play_alarm_sound(self):
-        """Reproduce el sonido de la alarma usando python-vlc"""
+        """Reproduce el sonido de la alarma en loop usando python-vlc"""
         try:
             if not self.is_alarm_playing:
                 self.is_alarm_playing = True
                 self.alarmPlayer.play()
-                print("Reproduciendo alarma con python-vlc...")
+                # Attach callback to loop the alarm sound upon end
+                self.alarmPlayer.event_manager().event_attach(vlc.EventType.MediaPlayerEndReached, self._alarm_loop_callback)
+                print("Reproduciendo alarma con python-vlc en loop...")
         except Exception as e:
             print(f"Error reproduciendo sonido: {e}")
             logging.error(f"Error reproduciendo sonido: {e}")
 
+    def _alarm_loop_callback(self, event):
+        # If the alarm is still active, restart the playback
+        if self.is_alarm_playing:
+            self.alarmPlayer.play()
+
     def stop_alarm_sound(self):
-        """Detiene el sonido de la alarma usando python-vlc"""
+        """Detiene el sonido de la alarma usando python-vlc y desactiva el loop"""
         try:
-            self.alarmPlayer.stop()
             self.is_alarm_playing = False
+            self.alarmPlayer.stop()
             print("Alarma detenida")
         except Exception as e:
             print(f"Error deteniendo sonido: {e}")
