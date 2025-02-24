@@ -40,6 +40,13 @@ class CalendarHandler:
 
     def get_todays_events(self):
         try:
+            # Refresh credentials if expired
+            if self.creds and self.creds.expired and self.creds.refresh_token:
+                from google.auth.transport.requests import Request
+                self.creds.refresh(Request())
+                with open(TOKEN_FILE, 'wb') as token:
+                    pickle.dump(self.creds, token)
+                    
             # Usar hora local en lugar de UTC
             now = datetime.datetime.now()
             start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
