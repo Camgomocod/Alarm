@@ -1,9 +1,9 @@
 import os
 
 # Obtener el directorio base del proyecto
-if os.path.exists('/home/baysi/Projects/Alarm'):
+if os.path.exists('/home/rasp/Src/Alarm'):
     # Estamos en Raspberry Pi
-    BASE_DIR = '/home/baysi/Projects/Alarm'
+    BASE_DIR = '/home/rasp/Src/Alarm'
 else:
     # Estamos en Windows/WSL
     BASE_DIR = '/mnt/c/Users/Usuario/Projects/Alarm'
