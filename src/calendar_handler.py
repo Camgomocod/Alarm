@@ -82,11 +82,17 @@ class CalendarHandler:
                 formatted_events.append({
                     'time': time_str,
                     'summary': event['summary'],
-                    'is_all_day': 'T' not in start
+                    'is_all_day': 'T' not in start,
+                    'start': start,
+                    'end': end
                 })
             
-            # Ordenar eventos: primero los de todo el día, luego por hora
-            formatted_events.sort(key=lambda x: (not x['is_all_day'], x['time']))
+            # Ordenar eventos por hora, manteniendo los eventos de todo el día al principio
+            formatted_events.sort(key=lambda x: (
+                not x['is_all_day'],
+                x['time'] if x['is_all_day'] else x['time'].split(' - ')[0]
+            ))
+            
             return formatted_events
             
         except Exception as e:

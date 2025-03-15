@@ -445,3 +445,11 @@
 2025-02-24 11:51:05,409 - INFO - Clima actualizado exitosamente: > 21.0°C | Partly cloudy
 > Humedad: 66.0%
 2025-02-24 11:51:05,422 - DEBUG - Generated new state HKcuWgRJjMmkdpumCHMaEECs9CSO72.
+2025-03-15 10:20:36,564 - DEBUG - Intentando conectar a WeatherUnlocked...
+2025-03-15 10:20:36,567 - DEBUG - Starting new HTTP connection (1): api.weatherunlocked.com:80
+2025-03-15 10:20:37,234 - DEBUG - http://api.weatherunlocked.com:80 "GET /api/current/2.4448,-76.6147?app_id=e2c5c5e4&app_key=519d24835c42f18e42f8bfc8f64c3e6a HTTP/1.1" 200 461
+2025-03-15 10:20:37,235 - DEBUG - Código de estado HTTP: 200
+2025-03-15 10:20:37,235 - DEBUG - URL completa: http://api.weatherunlocked.com/api/current/2.4448,-76.6147?app_id=e2c5c5e4&app_key=519d24835c42f18e42f8bfc8f64c3e6a
+2025-03-15 10:20:37,235 - DEBUG - Respuesta: {'lat': 3.55, 'lon': -76.38, 'alt_m': 961.0, 'alt_ft': 3152.89, 'wx_desc': 'Mostly cloudy', 'wx_code': 1, 'wx_icon': 'PartlyCloudyDay.gif', 'temp_c': 24.0, 'temp_f': 75.2, 'feelslike_c': 25.06, 'feelslike_f': 77.1, 'humid_pct': 78.0, 'windspd_mph': 4.35, 'windspd_kmh': 7.0, 'windspd_kts': 3.78, 'windspd_ms': 1.94, 'winddir_deg': 350.0, 'winddir_compass': 'N', 'cloudtotal_pct': 75.0, 'vis_km': 10.0, 'vis_mi': 6.21, 'vis_desc': None, 'slp_mb': 1017.9, 'slp_in': 30.14, 'dewpoint_c': 19.93, 'dewpoint_f': 67.88}
+2025-03-15 10:20:37,236 - INFO - Clima actualizado exitosamente: > 18.0°C | Mostly cloudy
+> Humedad: 78.0%
