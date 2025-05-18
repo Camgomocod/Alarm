@@ -6,7 +6,7 @@ if os.path.exists('/home/rasp/Src/Alarm'):
     BASE_DIR = '/home/rasp/Src/Alarm'
 else:
     # Estamos en Windows/WSL
-    BASE_DIR = '/mnt/c/Users/Usuario/Projects/Alarm'
+    BASE_DIR = '/mnt/c/Users/Usuario/Projects/Archive/Alarm'
 
 # Definir las rutas relativas al directorio base
 FONTS_DIR = os.path.join(BASE_DIR, 'fonts')
